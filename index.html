@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Graph Plotter</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        canvas {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h2>Function Graph Plotter</h2>
+    <input type="text" id="functionInput" placeholder="Enter a function, e.g., x^2">
+    <button onclick="plotGraph()">Plot</button>
+    <canvas id="graphCanvas" width="600" height="400"></canvas>
+    
+    <script>
+        let ctx = document.getElementById('graphCanvas').getContext('2d');
+        let chart;
+
+        function plotGraph() {
+            let inputFunction = document.getElementById('functionInput').value;
+            let parsedFunction = math.parse(inputFunction).compile();
+            
+            let xValues = [];
+            let yValues = [];
+            for (let x = -10; x <= 10; x += 0.1) {
+                xValues.push(x);
+                try {
+                    yValues.push(parsedFunction.evaluate({ x: x }));
+                } catch (e) {
+                    yValues.push(NaN);
+                }
+            }
+            
+            if (chart) {
+                chart.destroy();
+            }
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValues,
+                    datasets: [{
+                        label: `y = ${inputFunction}`,
+                        borderColor: 'blue',
+                        data: yValues,
+                        borderWidth: 2,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x-axis'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'y-axis'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
